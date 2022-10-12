@@ -8,7 +8,7 @@ const express = require('express')
 // local imports
 const util = require(__basedir + '/helpers/util')
 
-// get cofig
+// get config
 const config = require(__basedir + '/config')
 const {
   PORT: port,

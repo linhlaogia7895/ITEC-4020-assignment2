@@ -19,7 +19,7 @@ const DEFAULT_COMMENTS_PER_PAGE = 3
  * Pagination is used to return parts of the results to the user in series of pages.
  * You can read about pagination in mongodb here: https://docs.mongodb.com/manual/reference/method/cursor.skip/#pagination-example
  * For example imagine that maximum number of items per page is 5 and we have 7 items in
- * out database. As a result, we need to return the first 5 elements in the first page.
+ * our database. As a result, we need to return the first 5 elements in the first page.
  * For the second page, we need to `skip` over the first 5 elements and return the remaining
  * elements (up to a maximum of 5). As a result, our query from the database for paginated
  * results would typically look like this:
@@ -47,7 +47,7 @@ router.get('/heroes/:id', async (req, res) => {
 // POST /search/heroes/by-name --> searches for heroes by name, starting with the query provided as JSON object {"query": "..."}, sorted and paginated
 /**
  * Note: only return heroes whose names **start** with the provided query. For example, if our request says
- * `{"query": "fla"}`, we need to look for heroes whose names starts with fla (case **insensitive**) like `Flash`.
+ * `{"query": "fla"}`, we need to look for heroes whose names start with `fla` (case **insensitive**) like `Flash`.
  */
 router.post('/search/heroes/by-name', async (req, res) => {
   // TODO: fill out the code for the endpoint
@@ -55,7 +55,7 @@ router.post('/search/heroes/by-name', async (req, res) => {
 
 // POST /search/heroes/by-min-stats --> searches for heroes with powerstats greater than or equal to the provided values.
 /**
- * Note: here, return heroes with powerstats greater thano or equal to the provided values.
+ * Note: here, return heroes with powerstats greater than or equal to the provided values.
  * For example, if the query object is `{"speed": 100, "intelligence": 95}`, we are looking for heroes
  * whose `powerstats.speed` is greater than or equal to 100 **and** `powerstats.intelligence` is greater
  * than or equal to 95. The following powerstats would be acceptable:
