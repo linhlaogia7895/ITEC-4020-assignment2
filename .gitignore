@@ -1,0 +1,6 @@
+**/.vscode
+**/node_modules
+dataset/*.csv
+submission/*
+submission.zip
+.env
