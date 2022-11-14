@@ -1,4 +1,5 @@
 const express = require('express')
+const { isObjectIdOrHexString } = require('mongoose')
 const router = new express.Router()
 
 // models
@@ -36,12 +37,21 @@ const DEFAULT_COMMENTS_PER_PAGE = 3
 
 // GET /heroes -> gets a list of heroes, sorted and paginated
 router.get('/heroes', async (req, res) => {
-  // TODO: fill out the code for the endpoint
+  const page = req.query.page || 1
+  await Hero.find({}).sort({name:'asc'}).skip((page-1)*DEFAULT_HEROES_PER_PAGE).limit(DEFAULT_HEROES_PER_PAGE).exec((err, hero) => {
+    if (err) return handleError(err);
+    res.json(hero)
+  });
+    
 })
 
 // GET /heroes/:id --> gets a hero by id
 router.get('/heroes/:id', async (req, res) => {
-  // TODO: fill out the code for the endpoint
+  const id = req.params.id
+  await Hero.findById(id).exec((err, hero) => {
+    if (err) return handleError(err);
+    res.json(hero)
+  });
 })
 
 // POST /search/heroes/by-name --> searches for heroes by name, starting with the query provided as JSON object {"query": "..."}, sorted and paginated
@@ -50,7 +60,12 @@ router.get('/heroes/:id', async (req, res) => {
  * `{"query": "fla"}`, we need to look for heroes whose names start with `fla` (case **insensitive**) like `Flash`.
  */
 router.post('/search/heroes/by-name', async (req, res) => {
-  // TODO: fill out the code for the endpoint
+  const name = req.body.query
+  const page = req.query.page || 1
+  await Hero.find({}).sort({name: name}).skip((page-1)*DEFAULT_HEROES_PER_PAGE).limit(DEFAULT_HEROES_PER_PAGE).exec((err, hero) => {
+    if (err) return handleError(err);
+    res.json(hero)
+  });
 })
 
 // POST /search/heroes/by-min-stats --> searches for heroes with powerstats greater than or equal to the provided values.
@@ -71,7 +86,23 @@ router.post('/search/heroes/by-name', async (req, res) => {
  * 
  */
 router.post('/search/heroes/by-min-stats', async (req, res) => {
-  // TODO: fill out the code for the endpoint
+  const intelligence = req.body.intelligence || 0
+  const strength = req.body.strength|| 0
+  const speed = req.body.speed || 0
+  const durability = req.body.durability || 0
+  const power = req.body.power || 0
+  const combat = req.body.combat || 0
+  const page = req.query.page || 1
+  await Hero.where('intelligence').gte(intelligence)
+  .where('strength').gte(strength)
+  .where('speed').gte(speed)
+  .where('durability').gte(durability)
+  .where('power').gte(power)
+  .where('combat').gte(combat)
+  .skip((page-1)*DEFAULT_HEROES_PER_PAGE).limit(DEFAULT_HEROES_PER_PAGE).exec((err, hero) => {
+    if (err) return handleError(err);
+    res.json(hero)
+  });
 })
 
 // POST /heroes/:id/comments --> creates a comment for a hero, gets the object structure as JSON
@@ -80,12 +111,35 @@ router.post('/search/heroes/by-min-stats', async (req, res) => {
  * For more information, see: https://mongoosejs.com/docs/populate.html
  */
 router.post('/heroes/:id/comments', async (req, res) => {
-  // TODO: fill out the code for the endpoint
+  const id = req.params.id
+  const text = req.body.text
+  await Hero.findById(id).exec( async (err, hero) => {
+    if (err) return handleError(err);
+    const comment = new Comment({
+      hero: hero._id,
+      text: text
+    })
+    try {
+      const saveComment = await comment.save();
+      res.json(saveComment)
+    } catch(err) {
+      handleError(err)
+    }
+    
+  });
 })
 
 // GET /heroes/:id/comments --> gets the comments for a hero, paginated, sorted by posting date (descending, meaning from new to old)
 router.get('/heroes/:id/comments', async (req, res) => {
-  // TODO: fill out the code for the endpoint
+  const id = req.params.id
+  const page = req.query.page || 1
+  await Hero.findById(id).exec( async (err, hero) => {
+    if (err) return handleError(err);
+    await Comment.find({hero: hero._id}).sort('-timestamps').skip((page-1)*DEFAULT_COMMENTS_PER_PAGE).limit(DEFAULT_COMMENTS_PER_PAGE).exec( async (err, comment) => {
+      if (err) return handleError(err);
+      res.json(comment)
+    });
+  });
 })
 
 module.exports = router
